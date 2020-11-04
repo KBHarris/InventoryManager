@@ -1,57 +1,84 @@
 
-//Selectors
-
-//Event Listeners
-document.addEventListener('DOMContentLoaded', loadData)
-
-
-
-//Functions
-
-function checkIn(item, qty) {
-    /*TODO: Add item with selected quantity if quantity is greater than or equal to 1, if item 
-     is already in the list then add selected quantity to that item. Save table to a JSON file */
-}
-
-function checkout(item, qty) {
-    /*TODO: Subtract item with selected quantity if quantity is greater than or equal to 1, if item
-     is already in the list then subrtract selected quantity from that item. DSo not allow quantitys less that zero. Save the table to a JSON file */
-}
-
-function loadData() {
-    var hr = new XMLHttpRequest();
-    hr.open("GET", "data.json", true);
-    hr.setRequestHeader("Content-type", "application/json", true);
-    hr.onreadystatechange = function() {
-        if (hr.readyState == 4 && hr.status == 200) {
-            var data = JSON.parse(hr.responseText);
-            append_json(data);
-        }
+// Inv-item class: Represents an Inventory item
+class Invitem {
+    constructor(name,quantity) {
+        this.name = name
+        this.quantity = quantity
     }
-    hr.send(null);
+}
 
+// UI class:
+
+class UI {
+    static displayItems() {
+        const storedItems = [
+            {
+                name: "Desktop",
+                quantity: "20"
+            },
+            {
+                name: "Laptop",
+                quantity: "10"
+            }
+        ]
+
+        const items = storedItems
+
+        items.forEach((item)=> UI.addItemToList(item))
+    }
+
+    static addItemToList(item) {
+        const list = document.querySelector('#table-body')
+
+        const row = document.createElement('tr')
+
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+        `
+        list.appendChild(row)
+    }
+}
+
+// Storage Class:
+class Store {
+
+}
+
+// Event: Display Inventory items
+
+document.addEventListener('DOMContentLoaded', UI.displayItems)
+
+// Event: Check In an Item (If Item exists, update count. If not add item with count. Do not allow negative amount values)
+
+document.querySelector('#checkin-btn').addEventListener('click', (e) => {
+    //Get form values
+    const name = document.querySelector('#item-name').value
+    const quantity = document.querySelector('#item-quantity').value
+
+    //form validation
+    if(name === '' || quantity === '') {
+        alert("Completly fill out the form")
+    }
+
+    const item = new Invitem(name, quantity)
     
-}
-
-function saveData() {
-
+    //Add item to list
+    if (item.quantity < '1'){
+        alert('Cannot have zero or negative value')
+    } else {
+        UI.addItemToList(item)
+        document.getElementById("input-form").reset()
+    }
     
-}
+    
+    
+    
+})
+
+// Event: Check Out an Item (if item exists subtract amount from current count. If not display error. Do not allow negative count values)
 
 
-//this function appends the json data to the table 'table'
-function append_json(data){
-    let table = document.getElementById('table-body');
-    data.forEach(function(object) {
-        let tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + object.Item + '</td>' +
-            '<td>' + object.Quantity + '</td>'
-        table.appendChild(tr);
-    });
-}
 
-$('#checkin-btn').click( function() {
-    var table = $('#table').tableToJSON();
-    console.log(table)
-    alert(JSON.stringify(table));  
-});
+
+
